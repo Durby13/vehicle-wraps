@@ -1,0 +1,13 @@
+<meta>
+    <info author="Scorpyo" version="1.0" type="script" />
+
+    <file src="wraps/generic/*.dds" download="false" />
+
+    <file src="wraps/custom/orgs/gang/*.dds" download="false" />
+    <file src="wraps/custom/orgs/group/*.dds" download="false" />
+    <file src="wraps/custom/orgs/squad/*.dds" download="false" />
+
+    <file src="wraps/custom/users/**/*.dds" download="false" />
+    <file src="wraps/custom/users/**/allowed.txt" download="false" />
+
+</meta>
