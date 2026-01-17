@@ -1,0 +1,92 @@
+variables:
+  - name: resourceName
+    value: RPGvehicleWrapAssets
+  - group: DiscordWebhook
+  - group: Global
+  - group: Server
+
+trigger:
+  branches:
+    include:
+    - main
+    - feature/wrap-assets-pipelines
+  paths:
+    include:
+    - RPGvehicleWrapAssets
+
+pool: azure-vm
+
+stages:
+- stage: Build
+  jobs:
+  - job: 
+    steps:
+    - checkout: self
+      fetchDepth: 1
+    - template: ../_pipeline-templates/builds/build-and-publish.yaml
+      parameters:
+        resourceName: '$(resourceName)'
+
+- stage: GmServerDeploy
+  condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/main'))
+  dependsOn: Build
+  jobs:
+  - job: 
+    steps:
+    - checkout: none
+    - template: ../_pipeline-templates/deployment/deploy.yaml
+      parameters:
+        resourceName: '$(resourceName)'
+        sshConnection: '$(sshConnection)'
+        sshIp: '$(sshIp)'
+        sshUser: '$(sshUser)'
+        serverDirectory: '$(serverDirectoryGm)'
+        artifactName: '$(resourceName)-compiled'
+
+- stage: DevServerDeploy
+  condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/main'))
+  dependsOn: Build
+  jobs:
+  - job: 
+    steps:
+    - checkout: none
+    - template: ../_pipeline-templates/deployment/deploy.yaml
+      parameters:
+        resourceName: '$(resourceName)'
+        sshConnection: '$(sshConnection)'
+        sshIp: '$(sshIp)'
+        sshUser: '$(sshUser)'
+        serverDirectory: '$(serverDirectoryDev)'
+        artifactName: '$(resourceName)-uncompiled'
+
+- stage: DevCompiledServerDeploy
+  condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/main'))
+  dependsOn: Build
+  jobs:
+  - job: 
+    steps:
+    - checkout: none
+    - template: ../_pipeline-templates/deployment/compiled-deploy.yaml
+      parameters:
+        resourceName: '$(resourceName)'
+        sshConnection: '$(sshConnection)'
+        sshIp: '$(sshIp)'
+        sshUser: '$(sshUser)'
+        serverDirectory: '$(serverDirectoryDevCompiled)'
+        artifactName: '$(resourceName)-compiled'
+
+- stage: LiveServerDeploy
+  condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/main'))
+  dependsOn: Build
+  jobs:
+  - job: 
+    steps:
+    - checkout: none
+    - template: ../_pipeline-templates/deployment/deploy.yaml
+      parameters:
+        resourceName: '$(resourceName)'
+        sshConnection: '$(sshConnection)'
+        sshIp: '$(sshIp)'
+        sshUser: '$(sshUser)'
+        serverDirectory: '$(serverDirectoryLive)'
+        artifactName: '$(resourceName)-compiled'

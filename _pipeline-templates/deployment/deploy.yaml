@@ -1,0 +1,57 @@
+
+parameters:
+- name: sshConnection
+- name: sshIp
+- name: sshUser
+- name: serverDirectory
+- name: resourceName
+- name: artifactName
+- name: sshKeyFile
+
+steps:
+
+- task: DownloadPipelineArtifact@2
+  displayName: 'Download artifact'
+  inputs:
+    buildType: 'current'
+    artifactName: '${{ parameters.artifactName }}'
+    targetPath: '$(Pipeline.Workspace)/artifacts/${{ parameters.resourceName }}'
+    
+- task: replacetokens@6
+  inputs:
+    root: '$(Pipeline.Workspace)/artifacts/${{ parameters.resourceName }}'
+    sources: '**/*.pipeline-variables'
+
+- task: SSH@0
+  displayName: 'SSH empty directory'
+  inputs:
+    sshEndpoint: '${{ parameters.sshConnection }}'
+    runOptions: 'inline'
+    inline: |
+      rm -rf ${{ parameters.serverDirectory }}/mods/deathmatch/resources/${{ parameters.resourceName }}/*
+    readyTimeout: '20000'
+
+- task: Bash@3
+  displayName: 'SSH copy'
+  inputs:
+    targetType: 'inline'
+    script: |
+      #!/bin/bash
+      
+      scp -i ${{ parameters.sshKeyFile }} -r $(Pipeline.Workspace)/artifacts/${{ parameters.resourceName }}/** ${{ parameters.sshUser }}@${{ parameters.sshIp }}:${{ parameters.serverDirectory }}/mods/deathmatch/resources/${{ parameters.resourceName }}
+
+- task: ado-discord-webhook@2
+  inputs:
+    webhookId: '$(DiscordWebhookChannelId)'
+    webhookKey: '$(DiscordWebhookKey)'
+    name: 'Icarus'
+    avatar: 'https://cdn.discordapp.com/avatars/735920488446165032/f6b88355087243574d3f966921271415.png'
+    embeds: |
+      [{
+          "color": 65280,
+          "title": "Resource ${{ parameters.resourceName }} Deployed",
+          "description": "${{ parameters.resourceName }} has been deployed to ${{ parameters.serverDirectory }}.",
+          "author": {
+              "name": "Icarus"
+          }
+      }]
