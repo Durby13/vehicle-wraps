@@ -138,5 +138,5 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          curl -X POST $(VehicleWrapsRestartApiEndpoint) -H "Content-Type: application/json" -d '{"$(VehicleWrapsRestartApiToken)"}'
+          curl -X POST $(VehicleWrapsRestartApiEndpoint) -H "Content-Type: application/json" -d '["$(VehicleWrapsRestartApiToken)"]'
         
