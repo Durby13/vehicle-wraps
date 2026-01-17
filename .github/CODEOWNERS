@@ -1,0 +1,4 @@
+RPGvehicleWrapAssets/wraps @saesrpg/mta-creative
+RPGvehicleWrapAssets/azure-pipelines.yaml @saesrpg/mta-developers
+RPGvehicleWrapAssets/meta.xml @saesrpg/mta-developers
+*.lua @saesrpg/mta-developers
