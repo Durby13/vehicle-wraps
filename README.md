@@ -98,7 +98,8 @@ Once you have added your files to your forked repository:
 2.  **Open a Pull Request:**
     * Go to the "Pull Requests" tab in the original `SAESRPG/vehicle-wraps` repository.
     * Click **New Pull Request**.
-    * Select your fork and submit.
+    * Click the blue text that says **compare across forks**.
+    * Select your fork in the **head repository** drop-down and submit.
 
 ## ✅ General Rules
 
